@@ -1,0 +1,3 @@
+Django
+urllib3
+requests
