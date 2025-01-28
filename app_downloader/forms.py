@@ -1,4 +1,4 @@
-from django.forms import ModelForm, TextInput, forms
+from django.forms import ModelForm
 from app_downloader.models import ImageHistory
 
 

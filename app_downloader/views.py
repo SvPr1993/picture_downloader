@@ -1,32 +1,14 @@
 import requests
 from django.core.files.base import ContentFile
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
 from app_downloader.forms import UrlsForm
 from app_downloader.models import ImageHistory
 
 
-# def getImage():
-#    while True:
-#        url = input("Введите ссылку на картинку: ")
-#        dirName = input("Введите название картинки: ") + ".jpg"
-#        img = requests.get(url)
-#        with open(dirName, "wb") as imgFile:
-#            imgFile.write(img.content)
-#            imgFile.close()
-#        if input("Выход q") == "q" or "Q":
-#            break
-
-
-# getImage()
-
-#Докомпозировать задачу, а именно разбить ее на маленькие шаги
-#1 этап, нам нужно скачать файл по ссылке
-#2 этап, подготовить базу для сохранения в базу данный
-#3 этап, сохранение файла в базу
-#Вставлять вместо image.jpg реальное имя
-#API endpoint, который возвращает имя и hello используя только django
+# Реализовать все тоже самое только без форм, прописать код сохранения без forms.py
+# API endpoint, который возвращает имя и hello используя только django
 def base_page(request):
     imagehistory = ImageHistory.objects.all()
     link = request.POST.get("img_url")
@@ -34,8 +16,15 @@ def base_page(request):
         response = requests.get(link)
         img_history = ImageHistory()
         img_history.sourse_link = request.POST.get("img_url")
-        img_history.image.save("image2.jpg", ContentFile(response.content), save=True)
-        #img_history.save()
+        link_clear = link.split("/")
+        img_history.image.save(link_clear[-1], ContentFile(response.content), save=True)
+        form = UrlsForm(request.POST, request.FILES)
+        if form.is_valid():
+            img_history = ImageHistory(file_field=request.FILES["image"])
+            img_history.save()
+            return HttpResponseRedirect("/")
+        else:
+            print("Ошибка")
     print(link)
     return render(request, "index.html", {'imagehistory': imagehistory})
 
